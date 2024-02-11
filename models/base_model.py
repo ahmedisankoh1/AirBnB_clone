@@ -6,7 +6,7 @@ from datetime import datetime
 
 class BaseModel:
     """Represents the BaseModel of the AirBnB clone project."""
-    id = str(uuid4())
+    id = str(uuid.uuid4())
     created_at = datetime.now()
     updated_at = datetime.now()
 
