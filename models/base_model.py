@@ -1,4 +1,4 @@
-i#!/usr/bin/python3
+#!/usr/bin/python3
 """Defines the BaseModel class which every other class will inherit from."""
 import models
 import uuid
@@ -16,6 +16,9 @@ class BaseModel:
             **kwargs (dict): contains the Key-value pairs of attributes.
         """
         tformat = "%Y-%m-%dT%H:%M:%S.%f"
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.today()
+        self.updated_at = datetime.today()
         if len(kwargs) != 0:
             for i, j in kwargs.items():
                 if i == "created_at" or i == "updated_at":
@@ -23,13 +26,12 @@ class BaseModel:
                 else:
                     self.__dict__[i] = j
         else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.today()
-            self.updated_at = datetime.today()
+            models.storage.new(self)
 
     def save(self):
-        """Updates updated_at with the current datetime."""
+        """Update updated_at with the current datetime."""
         self.updated_at = datetime.today()
+        models.storage.save()
 
     def to_dict(self):
         """Returns the dictionary of the BaseModel instance in a neat way.
