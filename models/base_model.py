@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines the BaseModel class which every other class will inherit from."""
+"""Defines the BaseModel class."""
 import models
 import uuid
 from datetime import datetime
@@ -8,25 +8,35 @@ from datetime import datetime
 class BaseModel:
     """Represents the BaseModel of the HBnB project."""
 
-    def __init__(self, *args, **kwargs):
-        """Initialize a new BaseModel.
+    def __init__(self, *arg, **kwargs):
+        """
+        Initialises a new instance of the BaseModel.
 
         Args:
-            *args (any): Is Unused.
-            **kwargs (dict): contains the Key-value pairs of attributes.
+            *args: unused here.
+            **kwargs: Dictionary representation of the instance
+        If kwargs is not empty:
+            Each key has an attribute name
+            Each value is the value of the corresponding attr name
+            Converts datetime to datetime objects
+        Otherwise:
+            Create id and created_at as done innitially
         """
-        tformat = "%Y-%m-%dT%H:%M:%S.%f"
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.today()
-        self.updated_at = datetime.today()
-        if len(kwargs) != 0:
-            for i, j in kwargs.items():
-                if i == "created_at" or i == "updated_at":
-                    self.__dict__[i] = datetime.strptime(j, tformat)
-                else:
-                    self.__dict__[i] = j
+        if kwargs:
+            if '__class__' in kwargs:
+                del kwargs['__class__']
+            if 'created_at' in kwargs:
+                kwargs['created_at'] = datetime.strptime(
+                        kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            if 'updated_at' in kwargs:
+                kwargs['updated_at'] = datetime.strptime(
+                        kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            for key, value in kwargs.items():
+                setattr(self, key, value)
         else:
-            models.storage.new(self)
+            id = str(uuid.uuid4())
+            created_at = datetime.today()
+            updated_at = datetime.today()
 
     def save(self):
         """Update updated_at with the current datetime."""
@@ -34,9 +44,9 @@ class BaseModel:
         models.storage.save()
 
     def to_dict(self):
-        """Returns the dictionary of the BaseModel instance in a neat way.
+        """Return the dictionary of the BaseModel instance.
 
-        Includes the key-value pair __class__ representing
+        Includes the key/value pair __class__ representing
         the class name of the object.
         """
         clsdict = self.__dict__.copy()
