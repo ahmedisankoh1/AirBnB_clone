@@ -3,24 +3,25 @@
 import models
 import uuid
 from datetime import datetime
+from models import storage
 
 
 class BaseModel:
-    """Represents the BaseModel of the HBnB project."""
+    """Defination of the BaseModel of the AirBnB project."""
 
     def __init__(self, *arg, **kwargs):
         """
-        Initialises a new instance of the BaseModel.
+        Initialis a new instance of the BaseModel.
 
         Args:
             *args: unused here.
             **kwargs: Dictionary representation of the instance
-        If kwargs is not empty:
-            Each key has an attribute name
-            Each value is the value of the corresponding attr name
-            Converts datetime to datetime objects
+        If kwargs != empty:
+            Each key has an attribute name.
+            Each value is the value of the corresponding attribute name.
+            Converts datetime to datetime objects.
         Otherwise:
-            Create id and created_at as done innitially
+            Create id and created_at as done previously
         """
         if kwargs:
             if '__class__' in kwargs:
@@ -37,16 +38,17 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.today()
             self.updated_at = datetime.today()
+            models.storage.new(self)
 
     def save(self):
-        """Update updated_at with the current datetime."""
+        """Updates updated_at with the current datetime."""
         self.updated_at = datetime.today()
         models.storage.save()
 
     def to_dict(self):
-        """Return the dictionary of the BaseModel instance.
+        """Return the dictionary of the BaseModel instance in an easy to read way.
 
-        Includes the key/value pair __class__ representing
+        Includes the key-value pair __class__ representing
         the class name of the object.
         """
         clsdict = self.__dict__.copy()
@@ -56,6 +58,6 @@ class BaseModel:
         return clsdict
 
     def __str__(self):
-        """Return the print/str representation of the BaseModel instance."""
+        """Returns the printed representation of the BaseModel instance."""
         clsname = self.__class__.__name__
         return "[{}] ({}) {}".format(clsname, self.id, self.__dict__)
